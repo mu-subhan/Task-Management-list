@@ -1,5 +1,7 @@
-# Ignore environment files
+# Ignore env files in all subdirectories
 *.env
+**/.env
+
 
 # Node.js
 node_modules/

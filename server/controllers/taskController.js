@@ -5,8 +5,7 @@ exports.createTask = async (req, res) => {
     const task = await Task.create({
       user: req.user,
       title: req.body.title,
-      description: req.body.description,
-      status: req.body.status || 'pending'
+      description: req.body.description
     });
     res.status(201).json(task);
   } catch (err) {
@@ -22,13 +21,10 @@ exports.getTasks = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch tasks' });
   }
 };
-
 exports.getTask = async (req, res) => {
   try {
-    const task = await Task.findOne({ _id: req.params.id, user: req.user });
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
+    const task = await Task.findOne({ _id: req.params.id, user: req.user.id });
+    if (!task) return res.status(404).json({ message: 'Task not found' });
     res.status(200).json(task);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch task' });
@@ -45,6 +41,7 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
+// controllers/taskController.js
 exports.updateTask = async (req, res) => {
   try {
     const { title, description, status } = req.body;
@@ -54,28 +51,30 @@ exports.updateTask = async (req, res) => {
       return res.status(400).json({ message: 'Title is required' });
     }
 
-    // Validate status
-    if (status && !['pending', 'in-progress', 'completed'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status value' });
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id }, 
+      { 
+        title, 
+        description, 
+        status,
+        updatedAt: Date.now() 
+      },
+      { new: true, runValidators: true } // Return updated doc and run schema validations
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: 'Task not found or not authorized' });
     }
 
-    const task = await Task.findOne({ _id: req.params.id, user: req.user });
-    
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-
-    // Update the task
-    task.title = title;
-    task.description = description || '';
-    task.status = status || task.status;
-    task.updatedAt = Date.now();
-
-    await task.save();
-
-    res.status(200).json(task);
+    res.status(200).json({
+      success: true,
+      data: updatedTask
+    });
   } catch (err) {
     console.error('Update error:', err);
-    res.status(500).json({ message: err.message || 'Update failed' });
+    res.status(500).json({ 
+      success: false,
+      message: err.message || 'Update failed' 
+    });
   }
 };
