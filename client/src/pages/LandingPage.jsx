@@ -60,12 +60,12 @@ const LandingPage = () => {
             >
               Get Started
             </Link>
-            <Link
+            {/* <Link
               to="/features"
               className="px-8 py-3 text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition transform hover:scale-105 md:py-4 md:text-lg md:px-10"
             >
               Learn More
-            </Link>
+            </Link> */}
           </div>
           
           <div className="mt-16">
