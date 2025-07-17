@@ -23,11 +23,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const res = await API.post("/auth/login", formData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const res = await API.post("/auth/login", formData);
     localStorage.setItem('token', res.data.token);
     toast.success("Login successful!");
     navigate('/dashboard');
