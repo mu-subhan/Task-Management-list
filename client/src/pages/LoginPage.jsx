@@ -19,18 +19,23 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await API.post("/auth/login", formData);
-      localStorage.setItem('token', res.data.token);        
-      toast.success("Login successful!");                   
-      navigate('/dashboard');                               
-    } catch (error) {
-      toast.error(error.response?.data.message || "Login failed");
-    }
-  };
+  try {
+    const res = await API.post("/auth/login", formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    localStorage.setItem('token', res.data.token);
+    toast.success("Login successful!");
+    navigate('/dashboard');
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Login failed");
+    console.error("Login error:", error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
